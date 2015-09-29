@@ -47,3 +47,22 @@ func (*d data) increment_value(){
 func (*d data) decrement_value(){
     d.tape[d.ptr] -= 1
 }
+
+// Read input from stdin
+// The tape reads only one character at a time
+func (*d data) read () {
+    // we will read only one ASCII character from the stdin
+    // we will create a separate bye to store the character in
+    r := make([]unint8, 1)
+    r := bufio.NewReader(os.Stdin)
+    d.tape[d.ptr] = r
+}
+
+
+// Print out the ascii character to screen
+func (*d data) print(){
+    fmt.Printf("%s",string(uint8(d.tape[d.ptr])))
+}
+
+
+
