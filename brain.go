@@ -3,9 +3,9 @@
 package main
 
 import (
-    "bufio"
+    _"bufio"
     "fmt"
-    "log"
+    _"log"
     "os"
 )
 
@@ -23,46 +23,51 @@ type data struct{
 // Now here we will define some methods on our data strucutre.
 
 // Initialize our tape data structure
-func (*d data) initialize(){
+func (d *data) initialize(){
     d.tape = make([]uint8, 30000)
-    ptr = 0
+    d.ptr = 0
 }
 
 // Increment the pointer
-func (*d data) increment_ptr(){
+func (d *data) increment_ptr(){
     d.ptr += 1
 }
 
 // Decrement the pointer
-func (*d data) decrement_ptr(){
+func (d *data) decrement_ptr(){
     d.ptr -= 1
 }
 
 // Increment the value in current cell
-func (*d data) increment_value(){
+func (d *data) increment_value(){
     d.tape[d.ptr] += 1
 }
 
 // Decrement the value in current cell
-func (*d data) decrement_value(){
+func (d *data) decrement_value(){
     d.tape[d.ptr] -= 1
 }
 
 // Read input from stdin
 // The tape reads only one character at a time
-func (*d data) read () {
+func (d *data) read () {
     // we will read only one ASCII character from the stdin
     // we will create a separate bye to store the character in
-    r := make([]unint8, 1)
-    r := bufio.NewReader(os.Stdin)
-    d.tape[d.ptr] = r
+    r := make([]uint8, 1)
+     _, _ = os.Stdin.Read(r)
+    d.tape[d.ptr] = r[0]
 }
 
 
 // Print out the ascii character to screen
-func (*d data) print(){
+func (d *data) print(){
     fmt.Printf("%s",string(uint8(d.tape[d.ptr])))
 }
 
 
+func main(){
+    var  d data
+    d.initialize()
+    fmt.Printf("%d %d\n", d.tape[0], d.ptr)
+}
 
