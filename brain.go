@@ -3,15 +3,16 @@
 package main
 
 import (
-    "bufio"
+    _"bufio"
     "fmt"
+    "io/ioutil"
     "log"
     "os"
 )
 
 // Here we define our tape data structure
-// Tape is a slice of 8-bit unsigned integers. 
-// We will be getting ASCII values from the user as input, uint8 
+// Tape is a slice of 8-bit unsigned integers.
+// We will be getting ASCII values from the user as input, uint8
 // are perfect to store them.
 // We also have a pointer that points to the current cell in the tape.
 // We can increment or decrement this pointer.
@@ -24,7 +25,7 @@ type data struct{
 
 // Initialize our tape data structure
 func (d *data) initialize(){
-    d.tape = make([]uint8, 30000)
+    d.tape = make([]byte, 30000)
     d.ptr = 0
 }
 
@@ -53,7 +54,7 @@ func (d *data) decrement_value(){
 func (d *data) read () {
     // we will read only one ASCII character from the file
     // we will create a separate bye to store the character in
-    r := make([]uint8, 1)
+    r := make([]byte, 1)
      _, _ = os.Stdin.Read(r)
     d.tape[d.ptr] = r[0]
 }
@@ -61,7 +62,8 @@ func (d *data) read () {
 
 // Print out the ascii character to screen
 func (d *data) print(){
-    fmt.Printf("%s",string(uint8(d.tape[d.ptr])))
+    //fmt.Printf("%s",string(uint8(d.tape[d.ptr])))
+    fmt.Printf("%c\n",d.tape[d.ptr])
 }
 
 
@@ -76,19 +78,7 @@ func main(){
 
     fmt.Printf("Filename is %v\n", filename)
 
-    // open file
-    f, err := os.Open(filename)
-
-    if err != nil{
-        log.Printf("Error opening file")
-        os.Exit(1)
-    }
-
-    // close the file
-    defer f.Close()
-
-
-	buf, err := ioutil.ReadFile(inputFile)
+	buf, err := ioutil.ReadFile(filename)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
@@ -100,53 +90,56 @@ func main(){
     // initialize it
     d.initialize()
 
-    for scan.Scan(){
+    for i := 1; i < len(source); i++{
+        
+        fmt.Printf("%v\n", d.tape[d.ptr])
 
-        // we scan one line from the file
-        l :
-        = scan.Text()
+        switch source[i]{
+        
+        case '<':
+            d.decrement_ptr()
+        
+        case '>':
+            d.increment_ptr()
+       
+        case '+':
+            d.increment_value()
+      
+        case '-':
+            d.decrement_value()
+        
+        case '.':
+            d.print()
 
-        //fmt.Printf("%T\n", l)
-
-        for i := 0; i < len(l); i++{
-
-            switch l[i]{
-            case '>':
-                d.increment_ptr()
-
-            case '<':
-                d.decrement_ptr()
-
-            case '+':
-                d.increment_value()
-
-            case '-':
-                d.decrement_value()
-
-            case '.':
-                d.print()
-
-            case ',':
-                d.read()
-                //fmt.Printf("%s\n", l)
-
-            case '[':
-                if d.tape[d.ptr] == 0{
-                    for j := i; j < len(
+        case ',':
+            d.read()
+        
+        case '[':
+            if d.tape[d.ptr] == 0{
+                for j := i; j < len(source); j++{
+                    if source[j]  == ']'{
+                        i = j
+                        break
+                    }
+                    if j == len(source) - 1 {
+                        log.Printf("Braces missing in the loop\n")
+                        os.Exit(1)
+                    }
                 }
-
-
-            case ']':
             }
 
+        case ']':
+            if d.tape[d.ptr] != 0{
+                for j := i; j > 0; j-- {
+                    if source[j] == '['{
+                        i = j
+                        break
+                    }
+                    if j == 0{
+                        log.Printf("Braces missing in the loop\n")
+                    }
+                }
+            }
         }
-
     }
-
-    if scan.Err() != nil{
-        log.Printf("Error while scanning ", scan.Err())
-        os.Exit(1)
-    }
-
 }
-
