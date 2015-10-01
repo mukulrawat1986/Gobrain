@@ -51,7 +51,7 @@ func (d *data) decrement_value(){
 // Read input from stdin
 // The tape reads only one character at a time
 func (d *data) read () {
-    // we will read only one ASCII character from the stdin
+    // we will read only one ASCII character from the file
     // we will create a separate bye to store the character in
     r := make([]uint8, 1)
      _, _ = os.Stdin.Read(r)
@@ -87,8 +87,12 @@ func main(){
     // close the file
     defer f.Close()
 
-    // scan the file
-    scan := bufio.NewScanner(f)
+
+	buf, err := ioutil.ReadFile(inputFile)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	source := string(buf)
 
     // set our type for our machine
     var d data
@@ -99,13 +103,14 @@ func main(){
     for scan.Scan(){
 
         // we scan one line from the file
-        l := scan.Text()
+        l :
+        = scan.Text()
 
-        // Now we loop over every character in the file
-        for _, x := range l{
+        //fmt.Printf("%T\n", l)
 
-            switch l{
+        for i := 0; i < len(l); i++{
 
+            switch l[i]{
             case '>':
                 d.increment_ptr()
 
@@ -123,14 +128,19 @@ func main(){
 
             case ',':
                 d.read()
+                //fmt.Printf("%s\n", l)
 
             case '[':
+                if d.tape[d.ptr] == 0{
+                    for j := i; j < len(
+                }
 
 
             case ']':
             }
 
         }
+
     }
 
     if scan.Err() != nil{
