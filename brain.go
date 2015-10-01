@@ -3,9 +3,9 @@
 package main
 
 import (
-    _"bufio"
+    "bufio"
     "fmt"
-    _"log"
+    "log"
     "os"
 )
 
@@ -66,8 +66,77 @@ func (d *data) print(){
 
 
 func main(){
-    var  d data
+
+    if len(os.Args) != 2{
+        log.Printf("Please enter the file name")
+        os.Exit(1)
+    }
+
+    filename := os.Args[1]
+
+    fmt.Printf("Filename is %v\n", filename)
+
+    // open file
+    f, err := os.Open(filename)
+
+    if err != nil{
+        log.Printf("Error opening file")
+        os.Exit(1)
+    }
+
+    // close the file
+    defer f.Close()
+
+    // scan the file
+    scan := bufio.NewScanner(f)
+
+    // set our type for our machine
+    var d data
+
+    // initialize it
     d.initialize()
-    fmt.Printf("%d %d\n", d.tape[0], d.ptr)
+
+    for scan.Scan(){
+
+        // we scan one line from the file
+        l := scan.Text()
+
+        // Now we loop over every character in the file
+        for _, x := range l{
+
+            switch l{
+
+            case '>':
+                d.increment_ptr()
+
+            case '<':
+                d.decrement_ptr()
+
+            case '+':
+                d.increment_value()
+
+            case '-':
+                d.decrement_value()
+
+            case '.':
+                d.print()
+
+            case ',':
+                d.read()
+
+            case '[':
+
+
+            case ']':
+            }
+
+        }
+    }
+
+    if scan.Err() != nil{
+        log.Printf("Error while scanning ", scan.Err())
+        os.Exit(1)
+    }
+
 }
 
