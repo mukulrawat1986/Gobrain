@@ -11,13 +11,13 @@ import (
 )
 
 // Here we define our tape data structure
-// Tape is a slice of 8-bit unsigned integers.
+// Tape is a slice of bytes
 // We will be getting ASCII values from the user as input, uint8
 // are perfect to store them.
 // We also have a pointer that points to the current cell in the tape.
 // We can increment or decrement this pointer.
 type data struct{
-    tape []uint8
+    tape []byte
     ptr int
 }
 
@@ -53,7 +53,7 @@ func (d *data) decrement_value(){
 // The tape reads only one character at a time
 func (d *data) read () {
     // we will read only one ASCII character from the file
-    // we will create a separate bye to store the character in
+    // we will create a separate byte to store the character in
     r := make([]byte, 1)
      _, _ = os.Stdin.Read(r)
     d.tape[d.ptr] = r[0]
@@ -62,8 +62,7 @@ func (d *data) read () {
 
 // Print out the ascii character to screen
 func (d *data) print(){
-    //fmt.Printf("%s",string(uint8(d.tape[d.ptr])))
-    fmt.Printf("%c\n",d.tape[d.ptr])
+    fmt.Printf("%c",d.tape[d.ptr])
 }
 
 
@@ -86,17 +85,23 @@ func main(){
 
     // set our type for our machine
     var d data
+    var numloops int
 
     // initialize it
     d.initialize()
 
-    for i := 1; i < len(source); i++{
+    for i := 0; i < len(source); i++{
         
-        fmt.Printf("%v\n", d.tape[d.ptr])
-
+        //fmt.Printf("%v\n", d.tape[d.ptr])
+        //fmt.Printf("%c", source[i])
+        //fmt.Printf("%d", d.tape[d.ptr])
         switch source[i]{
         
         case '<':
+            if d.ptr == 0{
+                log.Printf("Error about to happen at decrementing pointer\n")
+                os.Exit(1)
+            }
             d.decrement_ptr()
         
         case '>':
@@ -106,6 +111,10 @@ func main(){
             d.increment_value()
       
         case '-':
+           /* if d.tape[d.ptr] == 0{
+                log.Printf("Error about to happen, decrementing value\n")
+                os.Exit(1)
+            }*/
             d.decrement_value()
         
         case '.':
@@ -116,30 +125,29 @@ func main(){
         
         case '[':
             if d.tape[d.ptr] == 0{
-                for j := i; j < len(source); j++{
-                    if source[j]  == ']'{
-                        i = j
-                        break
+                i++
+                for numloops > 0 || source[i] != ']'{
+                    if source[i] == '['{
+                        numloops++
+                    }else if source[i] == ']'{
+                        numloops--
                     }
-                    if j == len(source) - 1 {
-                        log.Printf("Braces missing in the loop\n")
-                        os.Exit(1)
-                    }
+                    i++
                 }
             }
 
         case ']':
-            if d.tape[d.ptr] != 0{
-                for j := i; j > 0; j-- {
-                    if source[j] == '['{
-                        i = j
-                        break
-                    }
-                    if j == 0{
-                        log.Printf("Braces missing in the loop\n")
-                    }
+            i--
+            for numloops > 0 || source[i] != '['{
+                if source[i] == ']'{
+                    numloops++
+                } else if source[i] == '['{
+                    numloops--
                 }
+                i--
             }
+            i--
+        
         }
     }
 }
